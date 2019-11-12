@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "banks2ynab"
+version = "0.1.1"
+description = "Link your banks into one place and update YNAB"
+authors = ["Erkin Khaydarov <khydrv@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+requests = "^2.22"
+python-dotenv = {extras = ["cli"], version = "^0.10.3"}
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.4"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
