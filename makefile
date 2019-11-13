@@ -1,2 +1,2 @@
 start:
-	poetry run dotenv run main.py
+	poetry run dotenv run python3 main.py
