@@ -1,13 +1,19 @@
-from apis.ynab import YNABInserter, YNABAPI
+import click
+
 from apis.truelayer import Santander, Monzo, Revolut
+from apis.ynab import YNABInserter
 
 BANKS = [
     Santander, Monzo, Revolut
 ]
 
-if __name__ == "__main__":
+
+@click.command()
+@click.option('--days', default=0, help='number of tx days')
+def import_transaction(days):
+
     data = [
-        bank().todays_txs()
+        bank().get_txs(days)
         for bank in BANKS
     ]
 
@@ -18,3 +24,7 @@ if __name__ == "__main__":
             if txs:
                 x = YNABInserter().run(account, txs)
                 print(x)
+
+
+if __name__ == '__main__':
+    import_transaction()

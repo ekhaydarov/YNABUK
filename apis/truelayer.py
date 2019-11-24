@@ -1,8 +1,8 @@
 import json
 import requests as r
-from datetime import datetime
 from dateutil.parser import parse
 from tools.enums import BaseEnum, TimeFormats
+from tools.time_ import list_of_dates
 from environment import TL_CLIENT, TL_SECRET, TL_ACCESS_CODE
 
 DATA_PATH = './data'
@@ -90,6 +90,11 @@ class TruelayerAPI:
         self.save_creds(res.json())
         print(f'access_token refreshed')
 
+    def check_token(self):
+        test = self.access_token_metadata()
+        if test.get('error'):
+            self.renew_access_token()
+
     @check_connection
     def access_token_metadata(self):
         return r.get(
@@ -99,7 +104,6 @@ class TruelayerAPI:
 
     @check_connection
     def list_all_cards(self):
-        print()
         return r.get(
             url=f'{self.URI.DATA_API}/{self.URI.CARDS}',
             headers=self.auth_header()
@@ -140,15 +144,17 @@ class TruelayerAPI:
             headers=self.auth_header()
         ).json()
 
-    def process_txs(self, txs):
+    def process_txs(self, txs, timeframe):
+        fmt = str(TimeFormats.DATE)
         return [
             tx
             for tx in txs
-            if parse(tx['timestamp']).date() == datetime.now().date()
+            if parse(tx['timestamp']).date().strftime(fmt) in list_of_dates(timeframe)
         ]
 
-    def todays_txs(self):
+    def get_txs(self, timeframe):
         result = {}
+        self.check_token()
         accounts = self.list_all_accounts()
 
         if accounts['status'] != 'Succeeded':
@@ -164,7 +170,7 @@ class TruelayerAPI:
             txs = self.account_txs(account_id)
 
             account_name = f'{provider_id}--{aid}'
-            result[account_name] = self.process_txs(txs)
+            result[account_name] = self.process_txs(txs, timeframe)
 
         return result
 
