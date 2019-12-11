@@ -91,7 +91,7 @@ class TruelayerAPI:
         print(f'access_token refreshed')
 
     def check_token(self):
-        test = self.access_token_metadata()
+        test = self.list_all_cards()
         if test.get('error'):
             self.renew_access_token()
 
